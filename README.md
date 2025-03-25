@@ -30,13 +30,13 @@ npm install
 
 Create a `config.txt` file in the project root with the following format:
 ```
-walletAddress|token
+walletAddress
 ```
 
 Example:
 ```
-0x1234567890abcdef1234567890abcdef12345678|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-0xabcdef1234567890abcdef1234567890abcdef12|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+0x1234567890abcdef1234567890abcdef12345678
+0xabcdef1234567890abcdef1234567890abcdef12
 ```
 
 ### Setting up proxies (Optional)
