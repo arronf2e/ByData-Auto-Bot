@@ -30,13 +30,13 @@ npm install
 
 Create a `config.txt` file in the project root with the following format:
 ```
-walletAddress
+walletAddress|token
 ```
 
 Example:
 ```
-0x1234567890abcdef1234567890abcdef12345678
-0xabcdef1234567890abcdef1234567890abcdef12
+0x1234567890abcdef1234567890abcdef12345678|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+0xabcdef1234567890abcdef1234567890abcdef12|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### Setting up proxies (Optional)
@@ -129,10 +129,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/airdropinsiders/ByData-Auto-Bot/issues).
 
-## 📬 Contact
+## 刷邀请
 
-For support or inquiries, please open an issue on the GitHub repository.
+修改 generateWallet.js 中的邀请码
 
----
-
-**Disclaimer:** This tool is for educational purposes only. Use at your own risk. The developers are not responsible for any account bans or issues that may arise from using this bot.
+```
+node generateWallet.js 1(邀请数量)
+```
