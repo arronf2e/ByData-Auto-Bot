@@ -337,7 +337,7 @@ async function registerWallet(apiClient, walletAddress, referredCode) {
       }
     });
 
-    console.log(`✅ Wallet ${walletAddress} registered successfully`);
+    console.log(`✅ Wallet ${walletAddress} 注册成功`);
     return response.data;
   } catch (error) {
     console.error(`❌ Error registering wallet:`, error.response?.data || error.message);
@@ -424,4 +424,12 @@ async function main() {
   }
 }
 
-main();
+// 原文件最后几行改为：
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  createApiClient,
+  registerWallet,
+}
