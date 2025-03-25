@@ -23,14 +23,11 @@ async function readConfig() {
     const configs = configContent.split('\n')
       .map(line => line.trim())
       .filter(line => line && !line.startsWith('#'));
-    
+
     const accounts = [];
     
     for (const config of configs) {
-      const [walletAddress, token] = config.split('|').map(part => part.trim());
-      if (walletAddress && token) {
-        accounts.push({ walletAddress, token });
-      }
+      accounts.push({ walletAddress: config, token: '' });
     }
     
     console.log(`Loaded ${accounts.length} accounts from config file`);
@@ -266,7 +263,7 @@ function displayStats(allTasks, walletAddress) {
   console.log('===========================\n');
 }
 
-async function processAccount(account, proxy = null) {
+async function processAccount(account, proxy = null, referalCode) {
   const { walletAddress, token } = account;
   
   console.log(`\n==== Processing account: ${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)} ====`);
@@ -275,6 +272,11 @@ async function processAccount(account, proxy = null) {
   }
   
   const apiClient = createApiClient(token, proxy);
+
+  await registerWallet(apiClient, walletAddress, referalCode);
+  await markeThirdEvent(walletAddress, proxy);
+
+
   let allTasks = [];
   
   let retryCount = 0;
@@ -322,12 +324,76 @@ async function processAccount(account, proxy = null) {
   displayStats(updatedTasks, walletAddress);
 }
 
+async function registerWallet(apiClient, walletAddress, referredCode) {
+  try {
+    const response = await apiClient.post('/users', {
+      walletAddress: walletAddress,
+      referredCode,
+    }, {
+      headers: {
+        'Connection': 'keep-alive',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-ch-ua-mobile': '?0',
+      }
+    });
+
+    console.log(`✅ Wallet ${walletAddress} registered successfully`);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Error registering wallet:`, error.response?.data || error.message);
+    return null;
+  }
+}
+
+async function markeThirdEvent(walletAddress, proxy = null) {
+  try {
+    const config = {
+      headers: {
+        'accept': '*/*',
+        'accept-language': 'zh-CN,zh;q=0.9',
+        'content-type': 'text/plain;charset=UTF-8',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'cross-site',
+        'x-client-id': '79698597d0e934426b15822da694bd31',
+        'x-sdk-name': 'unified-sdk',
+        'x-sdk-os': 'mac',
+        'x-sdk-platform': 'browser',
+        'x-sdk-version': '5.88.7',
+        'origin': 'https://bydata.app',
+        'referer': 'https://bydata.app/',
+      },
+      timeout: 30000,
+      httpsAgent: createProxyAgent(proxy),
+      proxy: false
+    };
+
+    const response = await axios.post('https://c.thirdweb.com/event', 
+      JSON.stringify({
+        source: "connectWallet",
+        action: "connect",
+        walletType: "com.okex.wallet",
+        walletAddress: walletAddress,
+        chainId: 1
+      }), 
+      config
+    );
+
+    console.log(`✅ Thirdweb event reported successfully for ${walletAddress}`);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Error sending thirdweb event:`, error.response?.data || error.message);
+    return null;
+  }
+}
+
 async function main() {
   try {
     displayBanner();
     
     const accounts = await readConfig();
     const proxies = await readProxies();
+
+    const referredCode = 'TIYN18WW'
     
     if (accounts.length === 0) {
       console.error('No valid accounts found in config file');
@@ -339,7 +405,7 @@ async function main() {
       const proxy = proxies.length > 0 ? proxies[i % proxies.length] : null;
       
       try {
-        await processAccount(account, proxy);
+        await processAccount(account, proxy, referredCode);
       } catch (error) {
         console.error(`Error processing account ${account.walletAddress.substring(0, 6)}...: ${error.message}`);
         console.log('Continuing with next account...');
