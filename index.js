@@ -3,7 +3,7 @@ const axios = require('axios');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const { SocksProxyAgent } = require('socks-proxy-agent');
 
-const API_BASE_URL = 'https://api.gatewayai.app/v1';
+const API_BASE_URL = 'https://ultra-api.bydata.app/v1';
 const CATEGORIES = ['SOCIAL', 'PARTNERS'];
 const CONFIG_FILE = 'config.txt';
 const PROXIES_FILE = 'proxies.txt';
@@ -161,19 +161,19 @@ async function makeApiRequest(apiClient, method, url, data = null) {
   }
 }
 
-async function fetchTasks(apiClient, walletAddress, category) {
+async function fetchTasks(apiClient, walletAddress) {
   try {
     const response = await makeApiRequest(
-      apiClient, 
-      'get', 
-      `/social/${walletAddress}?category=${category}`
+      apiClient,
+      'get',
+      `/social/actions/${walletAddress}`
     );
-    
+
     const tasks = response.data.socialActions || [];
-    console.log(`Found ${tasks.length} tasks in ${category} category`);
+    console.log(`Found ${tasks.length} tasks`);
     return tasks;
   } catch (error) {
-    console.error(`Error fetching ${category} tasks:`, error.response?.data || error.message);
+    console.error(`Error fetching tasks:`, error.response?.data || error.message);
     return [];
   }
 }
@@ -284,16 +284,12 @@ async function processAccount(account, proxy = null, referalCode) {
   
   while (retryCount < maxRetries) {
     try {
-      for (const category of CATEGORIES) {
-        const tasks = await fetchTasks(apiClient, walletAddress, category);
-        allTasks = [...allTasks, ...tasks];
-      }
-      
+      allTasks = await fetchTasks(apiClient, walletAddress);
       break;
     } catch (error) {
       retryCount++;
       console.error(`Error fetching tasks (attempt ${retryCount}/${maxRetries}):`, error.message);
-      
+
       if (retryCount < maxRetries) {
         console.log(`Waiting 10 seconds before retry...`);
         await new Promise(resolve => setTimeout(resolve, 10000));
