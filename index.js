@@ -4,7 +4,6 @@ const { HttpsProxyAgent } = require('https-proxy-agent');
 const { SocksProxyAgent } = require('socks-proxy-agent');
 
 const API_BASE_URL = 'https://ultra-api.bydata.app/v1';
-const CATEGORIES = ['SOCIAL', 'PARTNERS'];
 const CONFIG_FILE = 'config.txt';
 const PROXIES_FILE = 'proxies.txt';
 
@@ -210,7 +209,7 @@ async function claimTask(apiClient, walletAddress, taskId) {
     const response = await makeApiRequest(
       apiClient,
       'post',
-      '/social/claim',
+      '/social/actions/claim',
       payload
     );
     
@@ -310,11 +309,7 @@ async function processAccount(account, proxy = null, referalCode) {
   
   await processTasksWithDelay(apiClient, walletAddress, allTasks);
   
-  let updatedTasks = [];
-  for (const category of CATEGORIES) {
-    const tasks = await fetchTasks(apiClient, walletAddress, category);
-    updatedTasks = [...updatedTasks, ...tasks];
-  }
+  const updatedTasks = await fetchTasks(apiClient, walletAddress, category);
   
   console.log('\nFinal status:');
   displayStats(updatedTasks, walletAddress);
