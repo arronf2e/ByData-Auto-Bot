@@ -309,7 +309,7 @@ async function processAccount(account, proxy = null, referalCode) {
   
   await processTasksWithDelay(apiClient, walletAddress, allTasks);
   
-  const updatedTasks = await fetchTasks(apiClient, walletAddress, category);
+  const updatedTasks = await fetchTasks(apiClient, walletAddress);
   
   console.log('\nFinal status:');
   displayStats(updatedTasks, walletAddress);
