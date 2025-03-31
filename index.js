@@ -187,7 +187,7 @@ async function completeTask(apiClient, walletAddress, taskId) {
     const response = await makeApiRequest(
       apiClient,
       'post',
-      '/social/complete',
+      '/social/actions/complete',
       payload
     );
     
