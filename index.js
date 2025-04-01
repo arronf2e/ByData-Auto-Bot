@@ -168,7 +168,7 @@ async function fetchTasks(apiClient, walletAddress) {
       `/social/actions/${walletAddress}`
     );
 
-    const tasks = response.data.socialActions || [];
+    const tasks = response.data?.data.socialActions || [];
     console.log(`Found ${tasks.length} tasks`);
     return tasks;
   } catch (error) {
