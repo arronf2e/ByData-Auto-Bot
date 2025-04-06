@@ -3,7 +3,7 @@ const axios = require('axios');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const { SocksProxyAgent } = require('socks-proxy-agent');
 
-const API_BASE_URL = 'https://ultra-api.bydata.app/v1';
+const API_BASE_URL = 'https://mega-api.bydata.app/v1';
 const CONFIG_FILE = 'config.txt';
 const PROXIES_FILE = 'proxies.txt';
 
